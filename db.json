@@ -1,17 +1,38 @@
 {
   "posts": [
     {
-      "id": 2,
-      "title": "json-server22",
+      "id": 1,
+      "title": "json-server",
       "author": "typicode"
     },
     {
-      "title": "aaa",
-      "author": "bbb",
-      "id": 3
+      "id": 2,
+      "title": "test-title",
+      "author": "test1"
     }
   ],
-  "comments": [],
+  "comments": [
+    {
+      "id": 1,
+      "body": "some comment",
+      "postId": 1
+    },
+    {
+      "id": 2,
+      "body": "my comment 1",
+      "postId": 1
+    },
+    {
+      "id": 3,
+      "body": "my comment 2",
+      "postId": 2
+    },
+    {
+      "id": "4",
+      "body": "my comment 3",
+      "postId": "2"
+    }
+  ],
   "profile": {
     "name": "typicode"
   }

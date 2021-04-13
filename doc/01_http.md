@@ -1,12 +1,15 @@
-### 1. MDN文档
+## 1. MDN文档
+
     https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Overview
 
-### 2. HTTP请求交互的基本过程
+## 2. HTTP请求交互的基本过程
+
     1). 前后应用从浏览器端向服务器发送HTTP请求(请求报文)
     2). 后台服务器接收到请求后, 调度服务器应用处理请求, 向浏览器端返回HTTP响应(响应报文)
     3). 浏览器端接收到响应, 解析显示响应体/调用监视回调
 
-### 3. HTTP请求报文
+## 3. HTTP请求报文
+
     1). 请求行:
         method url
         GET /product_detail?id=2
@@ -19,8 +22,10 @@
         username=tom&pwd=123
         {"username": "tom", "pwd": 123}
 
-    
-### 4. HTTP响应报文
+
+​    
+## 4. HTTP响应报文
+
     1). 响应状态码: 200/404
     2). 多个响应头
         Content-Type: text/html;charset=utf-8
@@ -28,7 +33,8 @@
     3). 响应体
         html文本/json文本/js/css/图片...
 
-### 5. post请求体参数格式
+## 5. post请求体参数格式
+
     1). Content-Type: application/x-www-form-urlencoded;charset=utf-8
         用于键值对参数，参数的键值用=连接, 参数之间用&连接
         例如: name=%E5%B0%8F%E6%98%8E&age=12
@@ -38,7 +44,8 @@
     3). Content-Type: multipart/form-data
         用于文件上传请求
 
-### 6. 常见响应状态码
+## 6. 常见响应状态码
+
     200	 OK                     请求成功。一般用于GET与POST请求
     201  Created                已创建。成功请求并创建了新的资源
     401  Unauthorized           未授权/请求要求用户的身份认证
@@ -89,7 +96,7 @@
     <script>
       // 30分钟内不再发预检请求
       // axios.defaults.headers["Access-Control-Max-Age"] = "1800"
-
+    
       /* 1. GET请求: 从服务器端获取数据*/
       function testGet() {
         // axios.get('http://localhost:3000/posts') // 获取所有posts的数组
@@ -98,19 +105,19 @@
         // axios.get('http://localhost:3000/posts?title=json-server&author=typicode')
       }
       testGet()
-
+    
       /* 2. POST请求: 向服务器端添加新数据*/
       function testPost() {
         // axios.post('http://localhost:3000/comments', {body: 'xxx', postId: 1}) // 保存数据
       }
       testPost()
-
+    
       /* 3. PUT请求: 更新服务器端已经数据 */
       function testPut() {
         // axios.put('http://localhost:3000/comments/4', {body: 'yyy', postId: 1})
       }
       testPut()
-
+    
       /* 4. DELETE请求: 删除服务器端数据 */
       function testDelete() {
         // axios.delete('http://localhost:3000/comments/4')
