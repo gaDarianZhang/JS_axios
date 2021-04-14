@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>使用XHR封装ajax请求函数</title>
+  <title>使用Promise和XHR封装ajax请求函数</title>
 </head>
 <body>
   <button onclick="testGet()">发送GET请求</button><br>
@@ -12,5 +12,87 @@
   <button onclick="testPut()">发送PUT请求</button><br>
   <button onclick="testDelete()">发送Delete请求</button><br>
 
+  <script type="text/javascript">
+    
+  </script>
+
+  <script type="text/javascript">
+    function testGet() {
+      axios({
+        method:"GET",
+        // url:"http://localhost:3000/posts",
+        // params:{
+
+        // }
+        // url:"http://localhost:3000/posts/1",
+        // url:"http://localhost:3000/posts/?id=5",
+        url:"http://localhost:3000/posts/",
+        params:{
+          title:"test-title"
+        }
+      })
+      .then(
+        response=>{
+          console.log(response.data,response.status,response.statusText);
+        },
+        error=>{
+          alert(error.message);
+        }
+      )
+    }
+
+    function testPost() {
+      axios({
+        method:"POST",
+        url:"http://localhost:3000/posts",
+        data:{
+          title:"mamamiya",
+          author:"tl"
+        }
+      })
+      .then(
+        response=>{
+          console.log(response.data,response.status,response.statusText);
+        },
+        error=>{
+          alert(error.message);
+        }
+      )
+    }
+    function testPut() {
+      axios({
+        method:"PUT",
+        // url:"http://localhost:3000/posts/5",
+        // data:{
+        //   title:"mamamiya",
+        //   author:"tltl"
+        // }
+
+      })
+      .then(
+        response=>{
+          console.log(response.data,response.status,response.statusText);
+        },
+        error=>{
+          alert(error.message);
+        }
+      )
+    }
+    function testDelete() {
+      axios({
+        method:"DELETE",
+        url:"http://localhost:3000/posts/4",
+      })
+      .then(
+        response=>{
+          console.log(response.data,response.status,response.statusText);
+        },
+        error=>{
+          alert(error.message);
+        }
+      )
+    }
+    console.log("太扯淡了");
+  </script>
 </body>
 </html>
