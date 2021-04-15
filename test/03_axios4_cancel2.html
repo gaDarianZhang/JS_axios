@@ -35,7 +35,9 @@
           console.log('1111 onResolved', response.data)
         },
         error => {
-          // cancel = null
+          // cancel = null; //不能把cancel=null写在这里。当发出第二个请求的时候，把第一个请求置为了rejected。！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+                            //而且cancel这时已经是第二个请求的cancelToken，然后到了处理第一个请求的then的onRejected回调，！！！！！！！！！！！！！！！！！！！！！！
+                            //如果上来就让cancel=null，那么第二个请求的cancelToken就丢失了，后边就没办法取消第二个请求了！！！！！！！！！！！！！！！！！！！！！！！！
           if (axios.isCancel(error)) { // 取消请求导致的错误
             console.log('1111 取消请求', error.message)
           } else {

@@ -14,12 +14,14 @@
   <script src="https://cdn.bootcss.com/axios/0.19.0/axios.js"></script>
   <script>
     axios.defaults.baseURL = 'http://localhost:4000'
-    let cancel
+    let cancel = []
+    //每一个axios请求对应一个cancel Token。
     function getProducts1() {
-      axios('/getProducts12', {
-        cancelToken: new axios.CancelToken((c) => { // 在CancelToken中立即同步执行, 并传入用于取消请求的函数
+      axios('/getProducts1', {
+        cancelToken: new axios.CancelToken((c) => { // 在传入配置参数时，cancelToken属性就被立即赋值，！！！！！！！！！！！！！！！！！！！！！！！！！！
+                                                    // 那么CancelToken中执行器也立即同步执行, 并传入用于取消请求的函数！！！！！！！！！！！！！！！！！！！！
           // 保存用于取消请求的函数
-          cancel = c
+          cancel.push(c)
         })
       })
       .then(
@@ -28,7 +30,7 @@
           console.log('1111 onResolved', response.data)
         },
         error => {
-          if (axios.isCancel(error)) { // 取消请求导致的错误
+          if (axios.isCancel(error)) { // 判断是否是取消请求导致的错误！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
             console.log('1111 取消请求', error.message)
           } else {
             console.log('1111 请求出错', error.message)
@@ -43,7 +45,7 @@
         url: '/getProducts2',
         cancelToken: new axios.CancelToken((c) => { // 在CancelToken中立即同步执行, 并传入用于取消请求的函数
           // 保存用于取消请求的函数
-          cancel = c
+          cancel.push(c)
         })
       }).then(
         response => console.log('2222 onResolved', response.data),
@@ -58,9 +60,13 @@
     }
 
     function cancelReq() {
-      // 取消请求
-      if (cancel) {
-        cancel('强制取消')
+      // 取消请求 ,取消请求后axios的then将进入失败的回调。！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+      if (JSON.stringify(cancel)!=="[]") {
+        cancel.forEach(cl => {
+          cl("强制取消")
+        });
+        cancel = [];
+        // cancel('强制取消')
       }
     }
   </script>

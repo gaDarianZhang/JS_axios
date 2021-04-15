@@ -22,11 +22,12 @@
     /* 
     添加请求拦截器
     1. 是什么? 
-      在真正在发请求执行的回调函数
+      是在发请求前执行的回调函数
     2. 作用
         对请求的配置做一些处理: data, header, 界面loading提示
         对请求进行检查, 如果不满足条件不发请求
     */
+    //第二个请求拦截器比第一个请求拦截器先执行！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
     axios.interceptors.request.use(function (config) {
       console.log('req interceptor1 onResolved()', config)
       return config;
@@ -38,36 +39,39 @@
     });
 
     /* 
-     添加响应拦截器
-     1. 是什么? 
-        在得到响应后执行的回调函数(在外层的回调之前)
+      添加响应拦截器
+      1. 是什么? 
+        在得到响应后执行的回调函数，但是在axios的then回调前执行
     2. 作用
-        对请求成功的数据
+        对请求成功的数据进行处理
         对请求失败进行处理
     */
     axios.interceptors.response.use(
       function (response) {
         console.log('res interceptor1 onResolved()', response)
+        // throw "error!!!!!!!!!!!"
         // return response;
-        return response.data;
+        return response.data;//由下边的一个interceptor.response.use来接收。也就是下一个响应拦截器接收！！！！！！！！！！！！！！！！！！！
       },
       function (error) {
         console.log('res interceptor1 onRejected()')
-        return Promise.reject(error);
+        // return Promise.reject(error);
+        throw error;
       }
     )
     axios.interceptors.response.use(
       function (data) {
         console.log('res interceptor2 onResolved()', data)
-        return data;
+        return data;//最后一个响应拦截器返回的数据由axios().then的回调函数接收。！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
       },
       function (error) {
         console.log('res interceptor2 onRejected()')
-        return Promise.reject(error);
+        // return Promise.reject(error);
+        throw error;
       }
     )
 
-
+    //响应回调的执行顺序是：第一个响应拦截器、第二个响应拦截器。。。axios的then回调。！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
     axios({
       url: '/posts'
     }).then(
