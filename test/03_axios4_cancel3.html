@@ -28,7 +28,7 @@
         // 保存用于取消请求的函数
         cancel = c
       })
-
+      console.log("请求拦截器");
       return config // 必须返回它
     })
 
@@ -36,6 +36,7 @@
     axios.interceptors.response.use(
       response => {
         cancel = null
+        console.log("响应拦截器");
         return response
       },
 
@@ -44,9 +45,9 @@
           alert('取消请求错误: ' + error.message)
         } else {
           cancel = null
-          alert('请求错误: ' + error.message)
+          console.log('请求错误: ' + error.message);
         }
-
+        // throw error;
         return new Promise(() => {}) // 返回pending状态的promise 中断promise链 ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
         
       }
@@ -59,9 +60,9 @@
         response => {
           console.log('1111 onResolved', response.data)
         },
-       /*  error => {
-          onsole.log('1111 请求出错', error.message)
-        } */
+        // error => {
+        //   console.log('1111 请求出错', error.message)
+        // }
       )
     }
 
