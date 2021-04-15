@@ -98,126 +98,130 @@
 
 ### 2) 编码实现
 
-    /* 
-    使用XHR封装发送ajax请求的通用函数 
-      返回值: promise
-      参数为配置对象
-        url: 请求地址
-        params: 包含所有query请求参数的对象
-        data: 包含所有请求体参数数据的对象
-        method: 为请求方式
-    */
-    function axios({url, params={}, data={}, method='GET'}) {
-      // 返回一个promise对象
-      return new Promise((resolve, reject) => {
-        // 创建一个XHR对象
-        const request = new XMLHttpRequest()
-        
-        // 根据params拼接query参数
-        let queryStr = Object.keys(params).reduce((pre, key) => {
-          pre += `&${key}=${params[key]}`
-          return pre
-        }, '')
-        if (queryStr.length>0) {
-          queryStr = queryStr.substring(1)
-          url += '?' + queryStr
-        }
-        // 请求方式转换为大写
-        method = method.toUpperCase()
-        
-        // 初始化一个异步请求(还没发请求)
-        request.open(method, url, true)
-        // 绑定请求状态改变的监听
-        request.onreadystatechange = function () {
-          // 如果状态值不为4, 直接结束(请求还没有结束)
-          if (request.readyState !== 4) {
-            return
-          }
-          // 如果响应码在200~~299之间, 说明请求都是成功的
-          if (request.status>=200 && request.status<300) {
-            // 准备响应数据对象
-            const responseData = {
-              data: request.response,
-              status: request.status,
-              statusText: request.statusText
-            }
-            // 指定promise成功及结果值
-            resolve(responseData)
-          } else { // 请求失败了
-            // 指定promise失败及结果值
-            const error = new Error('request error staus '+ request.status)
-            reject(error)
-          }
-        }
+```js
+/* 
+使用XHR封装发送ajax请求的通用函数 
+  返回值: promise
+  参数为配置对象
+    url: 请求地址
+    params: 包含所有query请求参数的对象
+    data: 包含所有请求体参数数据的对象
+    method: 为请求方式
+*/
+function axios({url, params={}, data={}, method='GET'}) {
+  // 返回一个promise对象
+  return new Promise((resolve, reject) => {
+    // 创建一个XHR对象
+    const request = new XMLHttpRequest()
     
-        // 指定响应数据格式为json ==> 内部就是自动解析好
-        request.responseType = 'json'
-    
-        // 如果是post/put请求
-        if (method==='POST' || method==='PUT') {
-          // 设置请求头: 使请求体参数以json形式传递
-          request.setRequestHeader('Content-Type', 'application/json;charset=utf-8')
-          // 包含所有请求参数的对象转换为json格式
-          const dataJson = JSON.stringify(data)
-          // 发送请求, 指定请求体数据
-          request.send(dataJson)
-        } else {// GET/DELETE请求
-          // 发送请求
-          request.send(null)
-        }
-      })
+    // 根据params拼接query参数
+    let queryStr = Object.keys(params).reduce((pre, key) => {
+      pre += `&${key}=${params[key]}`
+      return pre
+    }, '')
+    if (queryStr.length>0) {
+      queryStr = queryStr.substring(1)
+      url += '?' + queryStr
     }
+    // 请求方式转换为大写
+    method = method.toUpperCase()
+    
+    // 初始化一个异步请求(还没发请求)
+    request.open(method, url, true)
+    // 绑定请求状态改变的监听
+    request.onreadystatechange = function () {
+      // 如果状态值不为4, 直接结束(请求还没有结束)
+      if (request.readyState !== 4) {
+        return
+      }
+      // 如果响应码在200~~299之间, 说明请求都是成功的
+      if (request.status>=200 && request.status<300) {
+        // 准备响应数据对象
+        const responseData = {
+          data: request.response,
+          status: request.status,
+          statusText: request.statusText
+        }
+        // 指定promise成功及结果值
+        resolve(responseData)
+      } else { // 请求失败了
+        // 指定promise失败及结果值
+        const error = new Error('request error staus '+ request.status)
+        reject(error)
+      }
+    }
+
+    // 指定响应数据格式为json ==> 内部就是自动解析好
+    request.responseType = 'json'
+
+    // 如果是post/put请求
+    if (method==='POST' || method==='PUT') {
+      // 设置请求头: 使请求体参数以json形式传递
+      request.setRequestHeader('Content-Type', 'application/json;charset=utf-8')
+      // 包含所有请求参数的对象转换为json格式
+      const dataJson = JSON.stringify(data)
+      // 发送请求, 指定请求体数据
+      request.send(dataJson)
+    } else {// GET/DELETE请求
+      // 发送请求
+      request.send(null)
+    }
+  })
+}
+```
 
 ### 3). 测试
 
-    function testGet() {
-      axios({
-        url: 'http://localhost:3000/comments',
-        // url: 'http://localhost:3000/comments2',
-        params: {id: 5, body: 'aaaa'},
-      }).then(response => {
-        console.log('get success', response.data, response)
-      }).catch(error => {
-        alert(error.message)
-      })
-    }
-    
-    function testPost() {
-      axios({
-        url: 'http://localhost:3000/comments',
-        // url: 'http://localhost:3000/comments2',
-        method: 'POST',
-        data: { body: 'aaaa', postId: 2 }
-      }).then(response => {
-        console.log('post success', response.data, response)
-      }).catch(error => {
-        alert(error.message)
-      })
-    }
-    
-    function testPut() {
-      axios({
-        // url: 'http://localhost:3000/comments/6',
-        url: 'http://localhost:3000/comments/3',
-        method: 'put',
-        data: {body: 'abcdefg', "postId": 2}
-      }).then(response => {
-        console.log('put success', response.data, response)
-      }).catch(error => {
-        alert(error.message)
-      })
-    }
-    
-    function testDelete() {
-      axios({
-        url: 'http://localhost:3000/comments/6',
-        method: 'delete',
-      }).then(response => {
-        console.log('delete success', response.data, response)
-      }).catch(error => {
-        alert(error.message)
-      })
-    }
+```js
+function testGet() {
+  axios({
+    url: 'http://localhost:3000/comments',
+    // url: 'http://localhost:3000/comments2',
+    params: {id: 5, body: 'aaaa'},
+  }).then(response => {
+    console.log('get success', response.data, response)
+  }).catch(error => {
+    alert(error.message)
+  })
+}
+
+function testPost() {
+  axios({
+    url: 'http://localhost:3000/comments',
+    // url: 'http://localhost:3000/comments2',
+    method: 'POST',
+    data: { body: 'aaaa', postId: 2 }
+  }).then(response => {
+    console.log('post success', response.data, response)
+  }).catch(error => {
+    alert(error.message)
+  })
+}
+
+function testPut() {
+  axios({
+    // url: 'http://localhost:3000/comments/6',
+    url: 'http://localhost:3000/comments/3',
+    method: 'put',
+    data: {body: 'abcdefg', "postId": 2}
+  }).then(response => {
+    console.log('put success', response.data, response)
+  }).catch(error => {
+    alert(error.message)
+  })
+}
+
+function testDelete() {
+  axios({
+    url: 'http://localhost:3000/comments/6',
+    method: 'delete',
+  }).then(response => {
+    console.log('delete success', response.data, response)
+  }).catch(error => {
+    alert(error.message)
+  })
+}
+```
 
 ## 11. 使用XHR封装 一个发ajax请求的通用函数
     函数的返回值为promise, 成功的结果为response, 异常的结果为error
@@ -236,12 +240,18 @@
 
 ## 2. axios的特点
 
-    基于promise的封装XHR的异步ajax请求库
-    浏览器端/node端都可以使用
-    支持请求／响应拦截器
-    支持请求取消
-    请求/响应数据转换
-    批量发送多个请求
+1. 基于promise的封装XHR的异步ajax请求库
+2. 浏览器端/node端都可以使用
+3. 支持请求／响应拦截器:
+    - <span style="color:red">后设置的请求拦截器先执行</span>
+    - <span style="color:red">发送请求</span>
+    - <span style="color:red">收到了响应/报错，但是还没传给axios的then中的回调函数</span>
+    - <span style="color:red">先设置的响应拦截器先执行</span>
+    - <span style="color:red">axios的then内回调函数执行</span>
+4. 支持请求取消
+    - <span style="color:red">如果在返回响应前取消了请求，那么也就会直接去把axios的状态置为rejected</span>
+5. 请求/响应数据转换
+6. 批量发送多个请求
 
 ## 3. axios常用语法
     axios(config): 通用/最本质的发任意类型请求的方式
@@ -264,7 +274,226 @@
     axios.all(promises): 用于批量执行多个异步请求
     axios.spread(): 用来指定接收所有成功数据的回调函数的方法
 
+### axios的then函数中的回调执行时机：
+
+axios会返回一个promise对象（其实是Axios.prototype.request函数返回的），但是这个promise对象的状态什么时候确定呢？只要这个状态一确定，响应拦截器/then中的回调就能执行了。
+
+- axios返回的这个promise对象是一个链式then调用最后then返回的一个promise对象。
+- <span style="color:red;font-size:22px;font-weight:bold">`Promise.resolve(config).then(请求拦截器2回调).then(请求拦截器1回调).then(dispatchRequest,undefined).then(响应拦截器1回调).then(响应拦截器2回调)`</span>,<span style="color:skyblue;font-size:18px;font-weight:bold">其中`dispatchRequset`调用adapter来发送xhr或者http请求。</span>
+
+- 最后的响应拦截器执行完之后才到axios后边的then()。
+
+1. <span style="color:red">如果成功返回了响应，这时就是resolve(response)</span>
+2. <span style="color:red">如果没能拿回响应，那么就置为rejected</span>
+3. <span style="color:red">如果在返回响应前取消了请求，那么也就会直接去置为rejected</span>
+
+### 请求/响应拦截器
+
+```js
+axios.defaults.baseURL = 'http://localhost:3000'
+
+/* 
+添加请求拦截器
+1. 是什么? 
+  是在发请求前执行的回调函数
+2. 作用
+    对请求的配置做一些处理: data, header, 界面loading提示
+    对请求进行检查, 如果不满足条件不发请求
+*/
+//第二个请求拦截器比第一个请求拦截器先执行！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+axios.interceptors.request.use(function (config) {
+  console.log('req interceptor1 onResolved()', config)
+  return config;
+});
+axios.interceptors.request.use(function (config) {
+  console.log('req interceptor2 onResolved()', config)
+  // return config; // 必须返回config
+  return config
+});
+
+/* 
+  添加响应拦截器
+  1. 是什么? 
+    在得到响应后执行的回调函数，但是在axios的then回调前执行
+2. 作用
+    对请求成功的数据进行处理
+    对请求失败进行处理
+*/
+axios.interceptors.response.use(
+  function (response) {
+    console.log('res interceptor1 onResolved()', response)
+    // throw "error!!!!!!!!!!!"
+    // return response;
+    return response.data;//由下边的一个interceptor.response.use来接收。也就是下一个响应拦截器接收！！！！！！！！！！！！！！！！！！！
+  },
+  function (error) {
+    console.log('res interceptor1 onRejected()')
+    // return Promise.reject(error);
+    throw error;
+  }
+)
+axios.interceptors.response.use(
+  function (data) {
+    console.log('res interceptor2 onResolved()', data)
+    return data;//最后一个响应拦截器返回的数据由axios().then的回调函数接收。！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+  },
+  function (error) {
+    console.log('res interceptor2 onRejected()')
+    // return Promise.reject(error);
+    throw error;
+  }
+)
+
+//响应回调的执行顺序是：第一个响应拦截器、第二个响应拦截器。。。axios的then回调。！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+axios({
+  url: '/posts'
+}).then(
+  data => {
+    console.log('onResolved()', data)
+  },
+  error => {
+    console.log('onRejected()')
+  }
+)
+```
+
+### 取消请求
+
+```js
+ let cancel = []
+    //每一个axios请求对应一个cancel Token。
+    function getProducts1() {
+      axios('/getProducts1', {
+        cancelToken: new axios.CancelToken((c) => { // 在传入配置参数时，cancelToken属性就被立即赋值，！！！！！！！！！！！！！！！！！！！！！！！！！！
+                                                    // 那么CancelToken中执行器也立即同步执行, 并传入用于取消请求的函数！！！！！！！！！！！！！！！！！！！！
+          // 保存用于取消请求的函数
+          cancel.push(c)
+        })
+      })
+      .then(
+        response => {
+          // cancel = null
+          console.log('1111 onResolved', response.data)
+        },
+        error => {
+          if (axios.isCancel(error)) { // 判断是否是取消请求导致的错误！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+            console.log('1111 取消请求', error.message)
+          } else {
+            console.log('1111 请求出错', error.message)
+          }
+          
+        }
+      )
+    }
+
+    function getProducts2() {
+      axios({
+        url: '/getProducts2',
+        cancelToken: new axios.CancelToken((c) => { // 在CancelToken中立即同步执行, 并传入用于取消请求的函数
+          // 保存用于取消请求的函数
+          cancel.push(c)
+        })
+      }).then(
+        response => console.log('2222 onResolved', response.data),
+        error => {
+          if (axios.isCancel(error)) {
+            console.log('2222 取消请求', error.message)
+          } else {
+            console.log('2222 请求出错', error.message)
+          }
+        }
+      )
+    }
+
+    function cancelReq() {
+      // 取消请求 ,取消请求后axios的then将进入失败的回调。！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+      if (JSON.stringify(cancel)!=="[]") {
+        cancel.forEach(cl => {
+          cl("强制取消")
+        });
+        cancel = [];
+        // cancel('强制取消')
+      }
+    }
+```
+
+```js
+axios.defaults.baseURL = 'http://localhost:4000'
+let cancel
+function getProducts1() {
+
+  // 如果有未完成的请求, 取消这个请求
+  if (cancel) {
+    cancel('强制取消')
+  }
+
+  axios('/getProducts1', {
+    cancelToken: new axios.CancelToken((c) => { // 在CancelToken中立即同步执行, 并传入用于取消请求的函数
+      // 保存用于取消请求的函数
+      cancel = c
+    })
+  })
+  .then(
+    response => {
+      cancel = null
+      console.log('1111 onResolved', response.data)
+    },
+    error => {
+      // cancel = null; //不能把cancel=null写在这里。当发出第二个请求的时候，把第一个请求置为了rejected。！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+                        //而且cancel这时已经是第二个请求的cancelToken，然后到了处理第一个请求的then的onRejected回调，！！！！！！！！！！！！！！！！！！！！！！
+                        //如果上来就让cancel=null，那么第二个请求的cancelToken就丢失了，后边就没办法取消第二个请求了！！！！！！！！！！！！！！！！！！！！！！！！
+      if (axios.isCancel(error)) { // 取消请求导致的错误
+        console.log('1111 取消请求', error.message)
+      } else {
+        cancel = null
+        console.log('1111 请求出错', error.message)
+      }
+      
+    }
+  )
+}
+
+function getProducts2() {
+
+  // 如果有未完成的请求, 取消这个请求
+  if (cancel) {
+    cancel('强制取消')
+  }
+
+  axios({
+    url: '/getProducts2',
+    cancelToken: new axios.CancelToken((c) => { // 在CancelToken中立即同步执行, 并传入用于取消请求的函数
+      // 保存用于取消请求的函数
+      cancel = c
+    })
+  }).then(
+    response => {
+      cancel = null
+      console.log('2222 onResolved', response.data)
+    },
+    error => {
+      if (axios.isCancel(error)) {
+        console.log('2222 取消请求', error.message)
+      } else {
+        cancel = null
+        console.log('2222 请求出错', error.message)
+      }
+    }
+  )
+}
+
+function cancelReq() {
+  // 取消请求
+  if (cancel) {
+    cancel('强制取消')
+  }
+}
+```
+
+
+
 ## 4. 源码难点与流程分析
+
     1. axios与Axios的关系
         axios函数对应的是Axios.prototype.request方法通过bind(Axiox的实例)产生的函数
         axios有Axios原型上的所有发特定类型请求的方法: get()/post()/put()/delete()
@@ -343,47 +572,68 @@
 
 ### 1). axios与Axios的关系
 
-### 2). axios为什么能有多种发请求的方法?
+- 从语法上来说：axios不是Axios的实例
+- 从功能上来说：axios是Axios的实例
+- <span style="color:red">axios是Axios.prototype.request函数bind()返回的函数，执行axios函数和Axios.prototype.request函数的参数一样，也就是使用axios函数发出请求其实就是使用request函数发送的。</span>
+- axios作为对象有Axios原型上的所有方法，有Axios对象上所有属性。<span style="color:red">那为什么不直接使用Axios的对象呢？可能就是为了让axios也可以作为函数使用，可以直接发送请求，而不用通过对象.request()来发送请求。</span>
+
+### 2). instance与axios的区别?
+
+- 相同: 
+        都是一个能发任意请求的函数: request(config)
+        都有发特定请求的各种方法: get()/post()/put()/delete()
+        都有默认配置和拦截器的属性: defaults/interceptors
+
+- 不同:
+        默认匹配的值很可能不一样
+        <span style="color:orange">instance没有axios后面添加的一些方法: create()/CancelToken()/all()</span>
+
+### 3). axios为什么能有多种发请求的方法?
 
     axios函数对应的是Axios.prototype.request方法通过bind(Axiox的实例)产生的函数
     axios有Axios原型上的所有发特定类型请求的方法: get()/post()/put()/delete()
     axios有Axios的实例上的所有属性: defaults/interceptors
     后面又添加了create()/CancelToken()/all()
 
-### 3). axios.create()返回的对象与axios的区别?
-
-    相同: 
-        都是一个能发任意请求的函数: request(config)
-        都有发特定请求的各种方法: get()/post()/put()/delete()
-        都有默认配置和拦截器的属性: defaults/interceptors
-    不同:
-        默认匹配的值很可能不一样
-        instance没有axios后面添加的一引起方法: create()/CancelToken()/all()
-
 ### 4). axios运行的整体流程
 
-### 5). Axios.prototype.request()都做了什么?
+![image-20210415165843955](AJAX-axios.assets/image-20210415165843955.png)
 
-### 6). dispatchrequest()都做了什么?
+整体流程: request(config)  ===> dispatchRequest(config) ===> xhrAdapter(config)
 
-### 7). xhrAdapter()做了什么?
+![image-20210415182140503](AJAX-axios.assets/image-20210415182140503.png)
 
-    整体流程: request(config)  ===> dispatchRequest(config) ===> xhrAdapter(config)
-    request(config): 将请求拦截器 / dispatchRequest() / 响应拦截器 通过promise链串连起来, 返回promise
-    dispatchRequest(config): 转换请求数据 ===> 调用xhrAdapter()发请求 ===> 请求返回后转换响应数据. 返回promise
-    xhrAdapter(config): 创建XHR对象, 根据config进行相应设置, 发送特定请求, 并接收响应数据, 返回promise 
+axios会返回一个promise对象（其实是Axios.prototype.request函数返回的），但guigu是这个promise对象的状态什么时候确定呢？只要这个状态一确定，响应拦截器/then中的回调就能执行了。
+
+- axios返回的这个promise对象是一个链式then调用最后then返回的一个promise对象。
+- <span style="color:red;font-size:22px;font-weight:bold">`Promise.resolve(config).then(请求拦截器2回调).then(请求拦截器1回调).then(dispatchRequest,undefined).then(响应拦截器1回调).then(响应拦截器2回调)`</span>,<span style="color:skyblue;font-size:18px;font-weight:bold">其中`dispatchRequset`调用adapter来发送xhr或者http请求。</span>
+
+- 最后的响应拦截器执行完之后才到axios后边的then()。
+
+### 5). Axios.prototype.request()
+
+<span style="color:red;font-size:22px;font-weight:bold">`Promise.resolve(config).then(请求拦截器2回调).then(请求拦截器1回调).then(dispatchRequest, undefined).then(响应拦截器1回调).then(响应拦截器2回调)`</span> 
+
+### 6). dispatchRequest()
+
+转化请求数据 ===》调用xhrAdapter()发送请求 ===》请求返回会转换响应数据，返回promise
+
+### 7). xhrAdapter()
+
+创建XHR对象, 根据config进行相应设置, 发送特定请求, 并接收响应数据, 返回promise 
 
 ### 8). axios的请求/响应拦截器是什么?
 
     请求拦截器: 在真正发请求前, 可以对请求进行检查或配置进行特定处理的函数, 包括成功/失败的函数, 传递的必须是config
     响应拦截器: 在请求返回后, 可以对响应数据进行特定处理的函数, 包括成功/失败的函数, 传递的默认是response
 
-### 9). axios的请求/响应数据转换器是什么?
+### 9). axios的请求/响应数据转换器
 
-    请求转换器: 对请求头和请求体数据进行特定处理的函数
+- 请求转换器: 对请求头和请求体数据进行特定处理的函数
         setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
         return JSON.stringify(data)
-    响应转换器: 将响应体json字符串解析为js对象或数组的函数
+
+- 响应转换器: 将响应体json字符串解析为js对象或数组的函数
         response.data = JSON.parse(response.data)
 
 ### 10). response的整体结构
@@ -405,4 +655,13 @@
         response
     }
 
-### 12). 如何取消已经发送的请求?
+### 12). 如何取消已经发送的请求
+
+- 当配置了cancelToken对象时，保存cancel函数
+    - 创建一个用于将来中断请求的cancelPromise
+    - 并定义了一个用于取消请求的cancel函数
+    - 将cancel函数传递出来
+- 调用cancel()来取消请求
+    - 执行cancel函数，传入错误信息message
+    - 内部会让cancelPromise变为成功，且成功的值为一个Cancel对象
+    - 在cancelPromise的成功回调中中断请求，并让发请求的promise失败，失败的reason为Cancel对象。
